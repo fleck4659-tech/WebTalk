@@ -9,61 +9,80 @@
 <body>
     <div id="app">
 
-        <!-- AUTH SCREEN -->
+        <!-- JOIN SCREEN -->
         <div id="auth-screen">
             <h1>WebTalk</h1>
             <p>Simple messaging. Photos. Files.</p>
-
-            <div class="auth-toggle">
-                <button type="button" id="btn-login" class="active">Log In</button>
-                <button type="button" id="btn-signup">Create Account</button>
-            </div>
-
-            <form id="auth-form" autocomplete="on">
-                <input type="text" id="username" name="username" placeholder="Username" required minlength="3" maxlength="30" autocomplete="username">
-                <input type="password" id="password" name="password" placeholder="Password" required minlength="8" maxlength="15" autocomplete="current-password">
-                <button type="submit" id="auth-submit">Log In</button>
-            </form>
-            <p id="auth-error" class="error-msg"></p>
+            <button id="join-btn">Join WebTalk</button>
+            <p class="hint">You’ll get a random name you can change later</p>
         </div>
 
-        <!-- CHAT SCREEN (hidden until logged in) -->
+        <!-- MAIN APP (hidden until joined) -->
         <div id="chat-screen" class="hidden">
-            <header id="chat-header">
-                <h2>WebTalk</h2>
-                <button id="theme-toggle" title="Toggle light/dark">🌙</button>
-            </header>
 
-            <div id="messages">
-                <!-- messages will appear here -->
-            </div>
-
-            <div id="typing-indicator" class="hidden">
-                <div class="typing-bubble">
-                    <span></span><span></span><span></span>
+            <!-- Sidebar -->
+            <aside id="sidebar">
+                <div class="sidebar-header">
+                    <h2>WebTalk</h2>
+                    <button id="theme-toggle" title="Toggle light/dark">🌙</button>
                 </div>
-            </div>
 
-            <!-- File / Photo Preview -->
-            <div id="file-preview" class="hidden">
-                <div id="preview-content"></div>
-                <button id="cancel-file" title="Cancel">✕</button>
-            </div>
-
-            <footer id="chat-input-area">
-                <button id="emoji-btn" title="Emoji">😊</button>
-                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
-                <label for="file-input" id="file-btn" title="Send photo or file">📎</label>
-                <input type="file" id="file-input" accept="image/*,*/*" hidden>
-                <button id="send-btn">Send</button>
-            </footer>
-
-            <!-- Desktop Emoji Picker -->
-            <div id="emoji-picker" class="hidden">
-                <div class="emoji-grid">
-                    <!-- emojis filled by JS -->
+                <!-- Your profile / change name -->
+                <div id="my-profile">
+                    <span id="my-name">WebTalk-????</span>
+                    <button id="change-name-btn" title="Change name">✏️</button>
                 </div>
-            </div>
+
+                <!-- Small search for friends -->
+                <div class="search-box small">
+                    <input type="text" id="friends-search" placeholder="Search friends...">
+                </div>
+
+                <!-- Friends list -->
+                <div id="friends-list">
+                    <p class="section-title">Friends</p>
+                    <div id="friends-container">
+                        <!-- friends will appear here -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main chat area -->
+            <main id="main-chat">
+                <!-- Big search for users -->
+                <div class="search-box big">
+                    <input type="text" id="users-search" placeholder="Search users on WebTalk...">
+                </div>
+
+                <div id="messages">
+                    <!-- messages appear here -->
+                </div>
+
+                <div id="typing-indicator" class="hidden">
+                    <div class="typing-bubble">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+
+                <!-- File preview -->
+                <div id="file-preview" class="hidden">
+                    <div id="preview-content"></div>
+                    <button id="cancel-file" title="Cancel">✕</button>
+                </div>
+
+                <footer id="chat-input-area">
+                    <button id="emoji-btn" title="Emoji">😊</button>
+                    <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                    <label for="file-input" id="file-btn" title="Send photo or file">📎</label>
+                    <input type="file" id="file-input" accept="image/*,*/*" hidden>
+                    <button id="send-btn">Send</button>
+                </footer>
+
+                <!-- Desktop Emoji Picker -->
+                <div id="emoji-picker" class="hidden">
+                    <div class="emoji-grid"></div>
+                </div>
+            </main>
         </div>
 
     </div>
