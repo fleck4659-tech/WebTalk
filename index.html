@@ -44,6 +44,12 @@
                 </div>
             </div>
 
+            <!-- File / Photo Preview -->
+            <div id="file-preview" class="hidden">
+                <div id="preview-content"></div>
+                <button id="cancel-file" title="Cancel">✕</button>
+            </div>
+
             <footer id="chat-input-area">
                 <button id="emoji-btn" title="Emoji">😊</button>
                 <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
@@ -51,6 +57,13 @@
                 <input type="file" id="file-input" accept="image/*,*/*" hidden>
                 <button id="send-btn">Send</button>
             </footer>
+
+            <!-- Desktop Emoji Picker -->
+            <div id="emoji-picker" class="hidden">
+                <div class="emoji-grid">
+                    <!-- emojis filled by JS -->
+                </div>
+            </div>
         </div>
 
     </div>

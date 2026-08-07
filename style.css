@@ -301,3 +301,96 @@ body.dark #message-input {
     padding: 10px 16px;
     border-radius: 20px;
 }
+
+/* ===== File Preview ===== */
+#file-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #f1f5f9;
+    border-top: 1px solid #e2e8f0;
+}
+
+body.dark #file-preview {
+    background: #333;
+    border-color: #444;
+}
+
+#preview-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+#preview-content img {
+    max-height: 60px;
+    max-width: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+#preview-content .file-name {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#cancel-file {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #64748b;
+}
+
+/* ===== Emoji Picker (Desktop) ===== */
+#emoji-picker {
+    position: absolute;
+    bottom: 70px;
+    left: 16px;
+    width: 280px;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    padding: 12px;
+    z-index: 100;
+}
+
+body.dark #emoji-picker {
+    background: #2a2a2a;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+}
+
+.emoji-grid span {
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.15s;
+}
+
+.emoji-grid span:hover {
+    background: #e2e8f0;
+}
+
+body.dark .emoji-grid span:hover {
+    background: #444;
+}
+
+/* Make chat-screen relative so picker positions correctly */
+#chat-screen {
+    position: relative;
+}
