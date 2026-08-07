@@ -8,15 +8,53 @@
 </head>
 <body>
     <div id="app">
+
+        <!-- AUTH SCREEN -->
         <div id="auth-screen">
             <h1>WebTalk</h1>
             <p>Simple messaging. Photos. Files.</p>
+
+            <div class="auth-toggle">
+                <button type="button" id="btn-login" class="active">Log In</button>
+                <button type="button" id="btn-signup">Create Account</button>
+            </div>
+
             <form id="auth-form" autocomplete="on">
                 <input type="text" id="username" name="username" placeholder="Username" required minlength="3" maxlength="30" autocomplete="username">
                 <input type="password" id="password" name="password" placeholder="Password" required minlength="8" maxlength="15" autocomplete="current-password">
-                <button type="submit">Continue</button>
+                <button type="submit" id="auth-submit">Log In</button>
             </form>
+            <p id="auth-error" class="error-msg"></p>
         </div>
+
+        <!-- CHAT SCREEN (hidden until logged in) -->
+        <div id="chat-screen" class="hidden">
+            <header id="chat-header">
+                <h2>WebTalk</h2>
+                <button id="theme-toggle" title="Toggle light/dark">🌙</button>
+            </header>
+
+            <div id="messages">
+                <!-- messages will appear here -->
+            </div>
+
+            <div id="typing-indicator" class="hidden">
+                <div class="typing-bubble">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+
+            <footer id="chat-input-area">
+                <button id="emoji-btn" title="Emoji">😊</button>
+                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                <label for="file-input" id="file-btn" title="Send photo or file">📎</label>
+                <input type="file" id="file-input" accept="image/*,*/*" hidden>
+                <button id="send-btn">Send</button>
+            </footer>
+        </div>
+
     </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
