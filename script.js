@@ -80,6 +80,8 @@ function loadData() {
     myNameEl.textContent = currentUser;
     updateBioDisplay();
     updateAvatarDisplay();
+    setupAvatarEditor();
+    setupBioEditor();
     renderFriends(friends);
     renderNotifications();
 
@@ -99,34 +101,56 @@ function updateAvatarDisplay() {
     }
 }
 
-myAvatarEl.addEventListener('click', () => avatarInput.click());
+function setupAvatarEditor() {
+    if (!myAvatarEl || !avatarInput) return;
 
-avatarInput.addEventListener('change', () => {
-    const file = avatarInput.files[0];
-    if (!file || !file.type.startsWith('image/')) return;
+    myAvatarEl.style.cursor = 'pointer';
+    myAvatarEl.title = 'Click to change profile picture';
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        currentAvatar = e.target.result;
-        updateAvatarDisplay();
-        saveData();
+    myAvatarEl.onclick = () => {
+        avatarInput.click();
     };
-    reader.readAsDataURL(file);
-});
+
+    avatarInput.onchange = () => {
+        const file = avatarInput.files[0];
+        if (!file || !file.type.startsWith('image/')) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            currentAvatar = e.target.result;
+            updateAvatarDisplay();
+            saveData();
+        };
+        reader.readAsDataURL(file);
+    };
+}
 
 // ===== Bio =====
 function updateBioDisplay() {
-    myBioEl.textContent = currentBio || 'No bio yet';
+    if (myBioEl) {
+        myBioEl.textContent = currentBio || 'No bio yet';
+    }
 }
 
-editBioBtn.addEventListener('click', () => {
-    const newBio = prompt('Enter a short bio (optional, max 80 characters):', currentBio);
-    if (newBio !== null) {
-        currentBio = newBio.trim().slice(0, 80);
-        updateBioDisplay();
-        saveData();
+function setupBioEditor() {
+    if (!editBioBtn) return;
+
+    editBioBtn.onclick = () => {
+        const newBio = prompt('Enter a short bio (optional, max 80 characters):', currentBio || '');
+        if (newBio !== null) {
+            currentBio = newBio.trim().slice(0, 80);
+            updateBioDisplay();
+            saveData();
+        }
+    };
+
+    // Also allow clicking the bio text itself
+    if (myBioEl) {
+        myBioEl.style.cursor = 'pointer';
+        myBioEl.title = 'Click to edit bio';
+        myBioEl.onclick = () => editBioBtn.click();
     }
-});
+}
 
 // ===== Join =====
 joinBtn.addEventListener('click', () => {
@@ -141,6 +165,8 @@ joinBtn.addEventListener('click', () => {
     myNameEl.textContent = currentUser;
     updateBioDisplay();
     updateAvatarDisplay();
+    setupAvatarEditor();
+    setupBioEditor();
     saveData();
     renderFriends(friends);
     renderNotifications();
@@ -512,3 +538,7 @@ cancelFileBtn.addEventListener('click', clearFilePreview);
 
 // ===== Start =====
 loadData();
+
+// Make sure editors are ready even if loadData did not run
+setupAvatarEditor();
+setupBioEditor();

@@ -698,3 +698,13 @@ body.dark .decline-btn {
     color: #94a3b8;
     font-size: 0.85rem;
 }
+
+/* Make profile avatar more obvious */
+.avatar.big {
+    border: 2px solid #14b8a6;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.avatar.big:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.25);
+}
