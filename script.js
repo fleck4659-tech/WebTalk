@@ -3,8 +3,8 @@ let currentUser = null;
 let selectedFile = null;
 let friends = [];
 let allUsers = [];
-let activeChat = null;          // who we are currently talking to
-let conversations = {};         // { friendName: [messages] }
+let activeChat = null;
+let conversations = {};
 
 // Elements
 const authScreen = document.getElementById('auth-screen');
@@ -32,6 +32,13 @@ const sendBtn = document.getElementById('send-btn');
 // ===== Detect mobile =====
 const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
 
+// ===== Only real people =====
+allUsers = [
+    'Alex', 'Sam', 'Jordan', 'Taylor', 'Casey',
+    'Riley', 'Morgan', 'Quinn', 'Avery', 'Jamie',
+    'Cameron', 'Drew', 'Parker', 'Reese', 'Skyler'
+];
+
 // ===== Random name =====
 function generateRandomName() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -42,19 +49,39 @@ function generateRandomName() {
     return `WebTalk-${code}`;
 }
 
+// ===== Save data to localStorage =====
+function saveData() {
+    localStorage.setItem('webtalk_user', currentUser);
+    localStorage.setItem('webtalk_friends', JSON.stringify(friends));
+    localStorage.setItem('webtalk_conversations', JSON.stringify(conversations));
+}
+
+// ===== Load data from localStorage =====
+function loadData() {
+    const savedUser = localStorage.getItem('webtalk_user');
+    if (savedUser) {
+        currentUser = savedUser;
+        friends = JSON.parse(localStorage.getItem('webtalk_friends') || '[]');
+        conversations = JSON.parse(localStorage.getItem('webtalk_conversations') || '{}');
+
+        myNameEl.textContent = currentUser;
+        renderFriends(friends);
+
+        authScreen.classList.add('hidden');
+        chatScreen.classList.remove('hidden');
+        return true; // already joined
+    }
+    return false;
+}
+
 // ===== Join =====
 joinBtn.addEventListener('click', () => {
     currentUser = generateRandomName();
     myNameEl.textContent = currentUser;
+    friends = [];
+    conversations = {};
 
-    // Only real people exist on WebTalk
-    allUsers = [
-        'Alex', 'Sam', 'Jordan', 'Taylor', 'Casey',
-        'Riley', 'Morgan', 'Quinn', 'Avery', 'Jamie',
-        'Cameron', 'Drew', 'Parker', 'Reese', 'Skyler'
-    ];
-
-    friends = []; // start empty – user must add people
+    saveData();
     renderFriends(friends);
 
     authScreen.classList.add('hidden');
@@ -69,8 +96,12 @@ changeNameBtn.addEventListener('click', () => {
     if (newName && newName.trim().length >= 3 && newName.trim().length <= 20) {
         currentUser = newName.trim();
         myNameEl.textContent = currentUser;
+        saveData();
     }
 });
+
+// ===== Try to load existing account on page start =====
+loadData();
 
 // ===== Theme =====
 themeToggle.addEventListener('click', () => {
@@ -161,6 +192,7 @@ function addFriend(name) {
         friends.push(name);
         conversations[name] = conversations[name] || [];
         renderFriends(friends);
+        saveData();
         addSystemMessage(`${name} was added to your friends! Click them to start chatting.`);
     }
 }
@@ -232,9 +264,12 @@ function displayMessage(content, isMine = true, isFile = false) {
 function addMessage(content, isMine = true, isFile = false) {
     if (!activeChat) return;
 
-    // Save to conversation history
+    // Save to conversation history (skip actual File objects – they can't be stored)
     if (!conversations[activeChat]) conversations[activeChat] = [];
-    conversations[activeChat].push({ content, isMine, isFile });
+    if (!isFile) {
+        conversations[activeChat].push({ content, isMine, isFile: false });
+        saveData();
+    }
 
     displayMessage(content, isMine, isFile);
 }
