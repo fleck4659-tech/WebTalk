@@ -52,6 +52,12 @@
                 <!-- Big search for users -->
                 <div class="search-box big">
                     <input type="text" id="users-search" placeholder="Search users on WebTalk...">
+                    <div id="search-results" class="hidden"></div>
+                </div>
+
+                <!-- Current chat header -->
+                <div id="chat-with" class="hidden">
+                    <span id="chat-with-name">Select a friend to chat</span>
                 </div>
 
                 <div id="messages">
@@ -72,10 +78,10 @@
 
                 <footer id="chat-input-area">
                     <button id="emoji-btn" title="Emoji">😊</button>
-                    <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                    <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" disabled>
                     <label for="file-input" id="file-btn" title="Send photo or file">📎</label>
                     <input type="file" id="file-input" accept="image/*,*/*" hidden>
-                    <button id="send-btn">Send</button>
+                    <button id="send-btn" disabled>Send</button>
                 </footer>
 
                 <!-- Desktop Emoji Picker -->

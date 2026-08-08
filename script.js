@@ -1,8 +1,10 @@
 // ===== State =====
 let currentUser = null;
 let selectedFile = null;
-let friends = [];          // will hold friend names
-let allUsers = [];         // mock list of other users
+let friends = [];
+let allUsers = [];
+let activeChat = null;          // who we are currently talking to
+let conversations = {};         // { friendName: [messages] }
 
 // Elements
 const authScreen = document.getElementById('auth-screen');
@@ -21,12 +23,16 @@ const previewContent = document.getElementById('preview-content');
 const cancelFileBtn = document.getElementById('cancel-file');
 const friendsSearch = document.getElementById('friends-search');
 const usersSearch = document.getElementById('users-search');
+const searchResults = document.getElementById('search-results');
 const friendsContainer = document.getElementById('friends-container');
+const chatWith = document.getElementById('chat-with');
+const chatWithName = document.getElementById('chat-with-name');
+const sendBtn = document.getElementById('send-btn');
 
 // ===== Detect mobile =====
 const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
 
-// ===== Generate random WebTalk name =====
+// ===== Random name =====
 function generateRandomName() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
@@ -36,25 +42,26 @@ function generateRandomName() {
     return `WebTalk-${code}`;
 }
 
-// ===== Join button =====
+// ===== Join =====
 joinBtn.addEventListener('click', () => {
     currentUser = generateRandomName();
     myNameEl.textContent = currentUser;
 
-    // Create some mock users & friends for demo
+    // Mock users that "exist" on WebTalk
     allUsers = [
         'WebTalk-9K2P', 'WebTalk-L4M7', 'WebTalk-X8Q1',
         'WebTalk-B3N5', 'WebTalk-R6T9', 'WebTalk-H2J4',
-        'Alex', 'Sam', 'Jordan', 'Taylor', 'Casey'
+        'Alex', 'Sam', 'Jordan', 'Taylor', 'Casey',
+        'Riley', 'Morgan', 'Quinn', 'Avery'
     ];
-    friends = ['WebTalk-9K2P', 'Alex', 'Sam'];
 
+    friends = []; // start empty – user must add people
     renderFriends(friends);
 
     authScreen.classList.add('hidden');
     chatScreen.classList.remove('hidden');
 
-    addMessage(`Welcome! Your name is ${currentUser}. You can change it anytime.`, false);
+    addSystemMessage(`Welcome! Your name is ${currentUser}. Search for people and add them to start chatting.`);
 });
 
 // ===== Change name =====
@@ -66,58 +73,140 @@ changeNameBtn.addEventListener('click', () => {
     }
 });
 
-// ===== Theme Toggle =====
+// ===== Theme =====
 themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark');
     themeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
 });
 
-// ===== Render friends list =====
+// ===== Render friends =====
 function renderFriends(list) {
     friendsContainer.innerHTML = '';
     if (list.length === 0) {
-        friendsContainer.innerHTML = '<p style="padding:12px 16px;color:#64748b;font-size:0.9rem;">No friends yet</p>';
+        friendsContainer.innerHTML = '<p style="padding:12px 16px;color:#64748b;font-size:0.9rem;">No friends yet – search & add people!</p>';
         return;
     }
     list.forEach(name => {
         const div = document.createElement('div');
-        div.className = 'friend-item';
+        div.className = 'friend-item' + (activeChat === name ? ' active' : '');
         const initial = name.charAt(0).toUpperCase();
         div.innerHTML = `
             <div class="avatar">${initial}</div>
             <span>${name}</span>
         `;
-        div.addEventListener('click', () => {
-            addMessage(`Opened chat with ${name}`, false);
-        });
+        div.addEventListener('click', () => openChat(name));
         friendsContainer.appendChild(div);
     });
 }
 
-// ===== Friends search (small) =====
+// ===== Friends search =====
 friendsSearch.addEventListener('input', () => {
     const q = friendsSearch.value.toLowerCase().trim();
     const filtered = friends.filter(f => f.toLowerCase().includes(q));
     renderFriends(filtered);
 });
 
-// ===== Users search (big) =====
+// ===== User search with Add Friend =====
 usersSearch.addEventListener('input', () => {
     const q = usersSearch.value.toLowerCase().trim();
+    searchResults.innerHTML = '';
+
     if (!q) {
-        // clear any previous search results from messages for demo
+        searchResults.classList.add('hidden');
         return;
     }
-    const results = allUsers.filter(u => u.toLowerCase().includes(q) && u !== currentUser);
-    if (results.length) {
-        addMessage(`Found users: ${results.join(', ')}`, false);
+
+    const results = allUsers.filter(u =>
+        u.toLowerCase().includes(q) &&
+        u !== currentUser
+    );
+
+    if (results.length === 0) {
+        searchResults.innerHTML = '<div class="search-result-item"><span>No users found</span></div>';
     } else {
-        addMessage(`No users found for "${q}"`, false);
+        results.forEach(name => {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+
+            const alreadyFriend = friends.includes(name);
+            item.innerHTML = `
+                <span class="name">${name}</span>
+                <button class="add-friend-btn" ${alreadyFriend ? 'disabled' : ''}>
+                    ${alreadyFriend ? 'Added' : 'Add Friend'}
+                </button>
+            `;
+
+            if (!alreadyFriend) {
+                item.querySelector('button').addEventListener('click', () => {
+                    addFriend(name);
+                    item.querySelector('button').textContent = 'Added';
+                    item.querySelector('button').disabled = true;
+                });
+            }
+            searchResults.appendChild(item);
+        });
+    }
+    searchResults.classList.remove('hidden');
+});
+
+// Hide search results when clicking outside
+document.addEventListener('click', (e) => {
+    if (!usersSearch.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.add('hidden');
     }
 });
 
-// ===== Add Message Helper =====
-function addMessage(content, isMine = true, isFile = false) {
+// ===== Add Friend =====
+function addFriend(name) {
+    if (!friends.includes(name)) {
+        friends.push(name);
+        conversations[name] = conversations[name] || [];
+        renderFriends(friends);
+        addSystemMessage(`${name} was added to your friends! Click them to start chatting.`);
+    }
+}
+
+// ===== Open a chat with someone =====
+function openChat(name) {
+    activeChat = name;
+    chatWith.classList.remove('hidden');
+    chatWithName.textContent = name;
+
+    // Enable input
+    messageInput.disabled = false;
+    sendBtn.disabled = false;
+    messageInput.placeholder = `Message ${name}...`;
+    messageInput.focus();
+
+    // Load conversation
+    const messagesEl = document.getElementById('messages');
+    messagesEl.innerHTML = '';
+
+    const history = conversations[name] || [];
+    history.forEach(msg => {
+        displayMessage(msg.content, msg.isMine, msg.isFile);
+    });
+
+    renderFriends(friends); // highlight active
+}
+
+// ===== System message helper =====
+function addSystemMessage(text) {
+    const messages = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'message';
+    div.style.alignSelf = 'center';
+    div.style.background = 'transparent';
+    div.style.border = 'none';
+    div.style.color = '#64748b';
+    div.style.fontSize = '0.9rem';
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+// ===== Display a message in the UI =====
+function displayMessage(content, isMine = true, isFile = false) {
     const messages = document.getElementById('messages');
     const div = document.createElement('div');
     div.className = 'message' + (isMine ? ' mine' : '');
@@ -140,36 +229,88 @@ function addMessage(content, isMine = true, isFile = false) {
     messages.scrollTop = messages.scrollHeight;
 }
 
-// ===== Live Typing Indicator =====
-let typingTimeout;
-messageInput.addEventListener('input', () => {
+// ===== Save + show message =====
+function addMessage(content, isMine = true, isFile = false) {
+    if (!activeChat) return;
+
+    // Save to conversation history
+    if (!conversations[activeChat]) conversations[activeChat] = [];
+    conversations[activeChat].push({ content, isMine, isFile });
+
+    displayMessage(content, isMine, isFile);
+}
+
+// ===== Live replies from the other person =====
+const replyPool = [
+    "Hey! How’s it going?",
+    "Nice to meet you 😊",
+    "What’s up?",
+    "Haha yeah!",
+    "That’s cool!",
+    "I’m good, thanks for asking!",
+    "Lol",
+    "Where are you from?",
+    "This app is pretty fun",
+    "True 🔥",
+    "Tell me more!",
+    "Awesome!",
+    "I was just thinking the same thing",
+    "👋",
+    "Sure, sounds good!"
+];
+
+function simulateReply() {
+    if (!activeChat) return;
+
+    // Show typing indicator
     typingIndicator.classList.remove('hidden');
-    clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(() => {
+
+    const delay = 800 + Math.random() * 1800; // 0.8 – 2.6 seconds
+    setTimeout(() => {
         typingIndicator.classList.add('hidden');
-    }, 1200);
-});
+
+        const reply = replyPool[Math.floor(Math.random() * replyPool.length)];
+        addMessage(reply, false); // not mine
+    }, delay);
+}
 
 // ===== Send Message =====
 function sendMessage() {
+    if (!activeChat) return;
+
     const text = messageInput.value.trim();
 
     if (selectedFile) {
         addMessage(selectedFile, true, true);
         clearFilePreview();
+        // Other person reacts to file
+        setTimeout(() => simulateReply(), 600);
     }
 
     if (text) {
         addMessage(text, true);
         messageInput.value = '';
+        // Live reply
+        simulateReply();
     }
 
     typingIndicator.classList.add('hidden');
 }
 
-document.getElementById('send-btn').addEventListener('click', sendMessage);
+sendBtn.addEventListener('click', sendMessage);
 messageInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
+});
+
+// ===== Live typing indicator (your own) =====
+let typingTimeout;
+messageInput.addEventListener('input', () => {
+    if (!activeChat) return;
+    typingIndicator.classList.remove('hidden');
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+        typingIndicator.classList.add('hidden');
+    }, 1000);
 });
 
 // ===== Emoji Picker =====
