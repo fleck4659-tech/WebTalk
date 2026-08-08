@@ -17,7 +17,7 @@
             <p class="hint">You’ll get a random name you can change later</p>
         </div>
 
-        <!-- MAIN APP (hidden until joined) -->
+        <!-- MAIN APP -->
         <div id="chat-screen" class="hidden">
 
             <!-- Sidebar -->
@@ -27,10 +27,31 @@
                     <button id="theme-toggle" title="Toggle light/dark">🌙</button>
                 </div>
 
-                <!-- Your profile / change name -->
+                <!-- Your profile -->
                 <div id="my-profile">
-                    <span id="my-name">WebTalk-????</span>
-                    <button id="change-name-btn" title="Change name">✏️</button>
+                    <div class="profile-top">
+                        <div id="my-avatar" class="avatar big" title="Change profile picture">?</div>
+                        <input type="file" id="avatar-input" accept="image/*" hidden>
+                        <div class="profile-info">
+                            <div class="name-row">
+                                <span id="my-name">WebTalk-????</span>
+                                <button id="change-name-btn" title="Change name">✏️</button>
+                            </div>
+                            <p id="my-bio" class="bio-text">No bio yet</p>
+                            <button id="edit-bio-btn" class="small-btn">Edit bio</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div id="notifications-section">
+                    <p class="section-title">
+                        Notifications
+                        <span id="notif-badge" class="badge hidden">0</span>
+                    </p>
+                    <div id="notifications-list">
+                        <p class="empty-msg">No notifications</p>
+                    </div>
                 </div>
 
                 <!-- Small search for friends -->
@@ -42,7 +63,7 @@
                 <div id="friends-list">
                     <p class="section-title">Friends</p>
                     <div id="friends-container">
-                        <!-- friends will appear here -->
+                        <!-- friends appear here -->
                     </div>
                 </div>
             </aside>
@@ -60,9 +81,7 @@
                     <span id="chat-with-name">Select a friend to chat</span>
                 </div>
 
-                <div id="messages">
-                    <!-- messages appear here -->
-                </div>
+                <div id="messages"></div>
 
                 <div id="typing-indicator" class="hidden">
                     <div class="typing-bubble">
