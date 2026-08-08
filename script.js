@@ -49,27 +49,27 @@ function generateRandomName() {
     return `WebTalk-${code}`;
 }
 
-// ===== Save data to localStorage =====
+// ===== Save data to localStorage (new keys = full wipe of old accounts) =====
 function saveData() {
-    localStorage.setItem('webtalk_user', currentUser);
-    localStorage.setItem('webtalk_friends', JSON.stringify(friends));
-    localStorage.setItem('webtalk_conversations', JSON.stringify(conversations));
+    localStorage.setItem('webtalk_v2_user', currentUser);
+    localStorage.setItem('webtalk_v2_friends', JSON.stringify(friends));
+    localStorage.setItem('webtalk_v2_conversations', JSON.stringify(conversations));
 }
 
 // ===== Load data from localStorage =====
 function loadData() {
-    const savedUser = localStorage.getItem('webtalk_user');
+    const savedUser = localStorage.getItem('webtalk_v2_user');
     if (savedUser) {
         currentUser = savedUser;
-        friends = JSON.parse(localStorage.getItem('webtalk_friends') || '[]');
-        conversations = JSON.parse(localStorage.getItem('webtalk_conversations') || '{}');
+        friends = JSON.parse(localStorage.getItem('webtalk_v2_friends') || '[]');
+        conversations = JSON.parse(localStorage.getItem('webtalk_v2_conversations') || '{}');
 
         myNameEl.textContent = currentUser;
         renderFriends(friends);
 
         authScreen.classList.add('hidden');
         chatScreen.classList.remove('hidden');
-        return true; // already joined
+        return true;
     }
     return false;
 }
@@ -99,9 +99,6 @@ changeNameBtn.addEventListener('click', () => {
         saveData();
     }
 });
-
-// ===== Try to load existing account on page start =====
-loadData();
 
 // ===== Theme =====
 themeToggle.addEventListener('click', () => {
@@ -415,3 +412,6 @@ function clearFilePreview() {
 }
 
 cancelFileBtn.addEventListener('click', clearFilePreview);
+
+// ===== Load existing account (runs after everything is ready) =====
+loadData();
