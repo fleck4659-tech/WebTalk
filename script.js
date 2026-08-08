@@ -47,12 +47,11 @@ joinBtn.addEventListener('click', () => {
     currentUser = generateRandomName();
     myNameEl.textContent = currentUser;
 
-    // Mock users that "exist" on WebTalk
+    // Only real people exist on WebTalk
     allUsers = [
-        'WebTalk-9K2P', 'WebTalk-L4M7', 'WebTalk-X8Q1',
-        'WebTalk-B3N5', 'WebTalk-R6T9', 'WebTalk-H2J4',
         'Alex', 'Sam', 'Jordan', 'Taylor', 'Casey',
-        'Riley', 'Morgan', 'Quinn', 'Avery'
+        'Riley', 'Morgan', 'Quinn', 'Avery', 'Jamie',
+        'Cameron', 'Drew', 'Parker', 'Reese', 'Skyler'
     ];
 
     friends = []; // start empty – user must add people
